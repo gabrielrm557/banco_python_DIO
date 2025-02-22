@@ -1,0 +1,166 @@
+#sacar,depositas,visualizar extrato
+
+#deposito : valores positivos,armazenado em variavel e exibido no extrato
+
+#saque : maximo 3 por dia,maximo de R$500 por saque,caso não tenha saldo
+#exibir uma mensagem informando que não sera possivel sacar o dinheiro
+#todos saques exibidos em uma varivel e exibidos na operação extrato
+
+#extrato : listar depositos e saques realizados na conta
+#no fim da listagem deve exibir o saldo atual da conta
+
+#formatação tem que ser em R$
+
+from datetime import datetime
+
+# Constantes
+SAQUE_VEZ_DIARIO_LIMITE = 500
+SAQUE_DIARIO_MAXIMO = 3
+TRANSACAO_DIARIA_LIMITE = 10
+
+# Funções
+def menu():
+    print(' Menu banco ABC \n')
+    print(' 1 - Sacar ')
+    print(' 2 - Depositar ')
+    print(' 3 - Extrato ')
+    print(' 4 - Cadastrar Usuário ')
+    print(' 5 - Cadastrar Conta Corrente ')
+    print(' 6 - Parar ')
+
+def cadastrar_usuario(usuarios):
+    nome = input('Digite o nome completo: ')
+    cpf = input('Digite o CPF (somente números): ')
+    data_nascimento = input('Digite a data de nascimento (dd/mm/aaaa): ')
+    endereco = input('Digite o endereço completo: ')
+    
+    # Verifica se o CPF já está cadastrado
+    for usuario in usuarios:
+        if usuario['cpf'] == cpf:
+            print("Usuário já cadastrado.")
+            return
+    
+    # Cadastra novo usuário
+    usuarios.append({
+        'nome': nome,
+        'cpf': cpf,
+        'data_nascimento': data_nascimento,
+        'endereco': endereco
+    })
+    print("Usuário cadastrado com sucesso!")
+
+def cadastrar_conta_corrente(usuarios, contas_correntes):
+    cpf = input('Digite o CPF do titular da conta: ')
+    
+    # Verifica se o CPF existe entre os usuários cadastrados
+    usuario_encontrado = None
+    for usuario in usuarios:
+        if usuario['cpf'] == cpf:
+            usuario_encontrado = usuario
+            break
+    
+    if not usuario_encontrado:
+        print("Usuário não encontrado. Cadastre o usuário primeiro.")
+        return
+    
+    # Cadastrar a conta vinculada ao usuário
+    conta = len(contas_correntes) + 1
+    contas_correntes.append({
+        'numero_conta': conta,
+        'cpf_titular': cpf,
+        'saldo': 0,
+        'registro_deposito': '',
+        'registro_saque': '',
+        'transacao_diaria_limite': TRANSACAO_DIARIA_LIMITE,
+        'saque_diario_limite': SAQUE_DIARIO_MAXIMO
+    })
+    print(f"Conta corrente {conta} cadastrada com sucesso para o usuário {usuario_encontrado['nome']}!")
+
+def sacar(conta):
+    if conta['transacao_diaria_limite'] > 0 and conta['saque_diario_limite'] > 0:
+        valor_saque = float(input('Quanto deseja sacar? '))
+        
+        if valor_saque > SAQUE_VEZ_DIARIO_LIMITE:
+            print("Você só pode sacar até R$500 por saque.")
+        elif valor_saque > conta['saldo']:
+            print("Saldo insuficiente.")
+        else:
+            conta['saldo'] -= valor_saque
+            data_op = str(datetime.now())
+            registro_saque = f'R${valor_saque:.2f} - {data_op}    '
+            conta['registro_saque'] += registro_saque
+            conta['saque_diario_limite'] -= 1
+            conta['transacao_diaria_limite'] -= 1
+            print(f"Saque de R${valor_saque:.2f} realizado com sucesso. Saldo atual: R${conta['saldo']:.2f}")
+    else:
+        print("Limite de saques ou transações diárias excedido.")
+
+def depositar(conta):
+    if conta['transacao_diaria_limite'] > 0:
+        valor_deposito = float(input('Digite a quantia que deseja depositar: '))
+        conta['saldo'] += valor_deposito
+        data_op = str(datetime.now())
+        registro_deposito = f'R${valor_deposito:.2f} - {data_op}    '
+        conta['registro_deposito'] += registro_deposito
+        conta['transacao_diaria_limite'] -= 1
+        print(f"Depósito de R${valor_deposito:.2f} realizado com sucesso. Saldo atual: R${conta['saldo']:.2f}")
+    else:
+        print("Limite de transações diárias excedido.")
+
+def extrato(conta):
+    print(f"Extrato:\nDepositos: {conta['registro_deposito']}\nSaques: {conta['registro_saque']}\nSaldo atual: R${conta['saldo']:.2f}")
+
+# Dados iniciais
+usuarios = []
+contas_correntes = []
+
+# Loop principal
+while True:
+    menu()
+    opcao = input('Escolha a operação desejada: ')
+    
+    if opcao == '1':  # Sacar
+        numero_conta = int(input('Digite o número da conta: '))
+        conta_encontrada = next((c for c in contas_correntes if c['numero_conta'] == numero_conta), None)
+        
+        if conta_encontrada:
+            sacar(conta_encontrada)
+        else:
+            print("Conta não encontrada.")
+    
+    elif opcao == '2':  # Depositar
+        numero_conta = int(input('Digite o número da conta: '))
+        conta_encontrada = next((c for c in contas_correntes if c['numero_conta'] == numero_conta), None)
+        
+        if conta_encontrada:
+            depositar(conta_encontrada)
+        else:
+            print("Conta não encontrada.")
+    
+    elif opcao == '3':  # Extrato
+        numero_conta = int(input('Digite o número da conta: '))
+        conta_encontrada = next((c for c in contas_correntes if c['numero_conta'] == numero_conta), None)
+        
+        if conta_encontrada:
+            extrato(conta_encontrada)
+        else:
+            print("Conta não encontrada.")
+    
+    elif opcao == '4':  # Cadastrar Usuário
+        cadastrar_usuario(usuarios)
+    
+    elif opcao == '5':  # Cadastrar Conta Corrente
+        cadastrar_conta_corrente(usuarios, contas_correntes)
+    
+    elif opcao == '6':  # Parar
+        print("Saindo...")
+        break
+    
+    else:
+        print("Opção inválida.")
+
+#10 transações diarias
+
+#se tentar fazer mais de 10 informar que ja excedeu o limite diario
+
+#mostrar no extrato data e hora das transações
