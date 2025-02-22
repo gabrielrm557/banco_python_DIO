@@ -4,15 +4,8 @@ Projeto de um prototipo de um banco contendo funções de saque,deposito, limite
 linguagem utilizada : Python
 
 exemplo : 
-            
-    '''
-            saldo -= saquefloat
-                saque = 'R$' + saque + ' '
-                registro_saque += saque
-                print(f'Você sacou R${saquefloat} seu saldo atual é de R${saldo}')
-                saque_diario_limite -= 1 
-    '''
 
+![carbon](https://github.com/user-attachments/assets/60432955-8a56-47cc-bb66-4fced40ceea6)
 
 desafio do bootcamp de python da dio
 
@@ -30,6 +23,7 @@ requisitos do projeto :
 #no fim da listagem deve exibir o saldo atual da conta
 
 #formatação tem que ser em R$
+(https://github.com/user-attachments/assets/2449255d-3d6d-4807-ac26-5816869e2f82)
 
 REGRAS : 
  - Sempre que citar alguma dependência do projeto, deixa ela como hyperlink para a página oficial daquela dependência
